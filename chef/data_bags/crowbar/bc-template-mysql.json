@@ -9,7 +9,7 @@
   "deployment": {
     "mysql": {
       "crowbar-revision": 0,
-      "elements": {},
+      "elements": { "mysql-server": [] },
       "element_order": [
         [ "mysql-server" ]
       ],
