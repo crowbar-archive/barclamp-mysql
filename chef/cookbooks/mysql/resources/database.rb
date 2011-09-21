@@ -1,4 +1,8 @@
-# Copyright 2011, Dell, Inc.
+#
+# Cookbook Name:: mysql
+# Resource:: database
+#
+# Copyright:: 2008-2011, Opscode, Inc <legal@opscode.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +17,11 @@
 # limitations under the License.
 #
 
-override[:mysql][:user]="mysql"
+actions :flush_tables_with_read_lock, :unflush_tables, :create_db, :query
 
-# declare what needs to be monitored
-node[:mysql][:monitor]={}
-node[:mysql][:monitor][:svcs] = []
-node[:mysql][:monitor][:ports]={}
-
+attribute :host, :kind_of => String
+attribute :username, :kind_of => String
+attribute :password, :kind_of => String
+attribute :database, :kind_of => String
+attribute :sql, :kind_of => String
+attribute :exists, :default => false

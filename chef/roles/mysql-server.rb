@@ -1,7 +1,7 @@
 name "mysql-server"
 description "Mysql Server Role"
 run_list(
-         "recipe[mysql::api]",
+         "recipe[mysql::server]",
          "recipe[mysql::monitor]"
 )
 default_attributes()

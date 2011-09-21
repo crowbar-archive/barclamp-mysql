@@ -1,17 +1,24 @@
-DESCRIPTION
-===========
-Chef Cookbook to install and configure Mysql
+= DESCRIPTION:
 
-REQUIREMENTS
-============
-TBD
+Library provides a method to generate secure passwords for use in recipes.
 
+= REQUIREMENTS:
 
-License
-=======
-Author:: Crowbar Template
+OpenSSL Ruby bindings must be installed, which are a requirement for Chef anyway.
 
-Copyright:: 2011 Dell, Inc 
+= USAGE:
+
+Most often this will be used to generate a secure password for an attribute.
+
+    include Opscode::OpenSSL::Password
+
+    set_unless[:my_password] = secure_password
+
+= LICENSE and AUTHOR:
+
+Author:: Joshua Timberman (<joshua@opscode.com>)
+
+Copyright:: 2009, Opscode, Inc
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

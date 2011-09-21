@@ -6,5 +6,5 @@
   %div.container
     %p
       %label{ :for => :backing_type }= t('.foo')
-      = select_tag :backing_type, options_for_select([['XKCD','xkcd'], ['Dilbert', 'dilbert']], @proposal.raw_data['attributes'][@proposal.barclamp]["foo"]), :onchange => "update_value('foo', 'foo', 'string')"
+      = input_tag :backing_type, options_for_select([['XKCD','xkcd'], ['Dilbert', 'dilbert']], @proposal.raw_data['attributes'][@proposal.barclamp]["foo"]), :onchange => "update_value('foo', 'foo', 'string')"
 
