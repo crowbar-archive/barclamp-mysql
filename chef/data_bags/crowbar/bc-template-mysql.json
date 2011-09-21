@@ -3,7 +3,7 @@
   "description": "Installation for Mysql",
   "attributes": {
     "mysql": {
-      "foo": "bar"
+      "datadir": "/var/lib/mysql"
     }
   },
   "deployment": {
