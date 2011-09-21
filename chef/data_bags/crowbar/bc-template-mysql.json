@@ -1,0 +1,26 @@
+{
+  "id": "bc-template-mysql",
+  "description": "Installation for Mysql",
+  "attributes": {
+    "mysql": {
+      "foo": "bar"
+    }
+  },
+  "deployment": {
+    "mysql": {
+      "crowbar-revision": 0,
+      "elements": {},
+      "element_order": [
+        [ "mysql-server" ]
+      ],
+      "config": {
+        "environment": "mysql-base-config",
+        "mode": "full",
+        "transitions": false,
+        "transition_list": [
+        ]
+      }
+    }
+  }
+}
+
