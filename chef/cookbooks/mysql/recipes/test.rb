@@ -21,23 +21,34 @@
 include_recipe "mysql::client"
 
 
-db_server = search(:node, "run_list:recipe[mysql::server]")
+db_server = search(:node, "role:mysql-server")
 
 mysql_database "create test database" do
-  host "#{db_server[0][:rackspace][:private_ip]}"
-  action :query
-  
-end
-
-mysql_database "create test database user" do
-  
-end
-
-
-mysql_database "create application_production database" do
-  host "localhost"
-  username "root"
-  password node[:mysql][:server_root_password]
-  database "application_production"
+  host "#{db_server[0].ipaddress}"
+  username "db_maker"
+  password "#{db_server[0].mysql.db_maker_password}"
+  database "test_db"
   action :create_db
 end
+Chef::Log.info "pwgimme:  #{node[:mysql][:db_maker_password]}"
+Chef::Log.info "pwgimme:  #{db_server[0].mysql.db_maker_password}"
+
+# The stanza below does not work. Yet.
+
+#mysql_database "create test database user" do
+#  host "#{db_server[0].ipaddress}"
+#  username "db_maker"
+#  password "#{db_server[0].mysql.db_maker_password}"
+#  database "test_db"
+#  action :query
+#  query "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON *.* TO 'test_user'@'%' IDENTIFIED BY '#{db_server[0].mysql.db_maker_password}' WITH GRANT OPTION;"
+#end
+
+
+#mysql_database "create application_production database" do
+#  host "localhost"
+#  username "root"
+#  password node[:mysql][:server_root_password]
+#  database "application_production"
+#  action :create_db
+#end

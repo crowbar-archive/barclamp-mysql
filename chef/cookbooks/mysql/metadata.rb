@@ -8,6 +8,7 @@ recipe            "mysql", "Includes the client recipe to configure a client"
 recipe            "mysql::client", "Installs packages required for mysql clients using run_action magic"
 recipe            "mysql::server", "Installs packages required for mysql servers w/o manual intervention"
 recipe            "mysql::server_ec2", "Performs EC2-specific mountpoint manipulation"
+recipe            "mysql::test", "Sample Test recipe to confirm functionality"
 
 %w{ debian ubuntu centos suse fedora redhat }.each do |os|
   supports os
