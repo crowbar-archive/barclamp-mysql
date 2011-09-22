@@ -110,12 +110,14 @@ template "/etc/mysql/grants.sql" do
   action :create
 end
 
-if system('mysql -u root -e "show databases;"') == 0
-  execute "mysql-install-privileges" do  
+status = system('mysql -u root -e "show databases;"')
+
+if status
+  execute "mysql-install-privileges" do
     command "/usr/bin/mysql -u root < #{grants_path}"
   end
 else
-  execute "mysql-install-privileges" do  
+  execute "mysql-install-privileges" do
     command "/usr/bin/mysql -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }#{node['mysql']['server_root_password']} < #{grants_path}"
   end
 end
