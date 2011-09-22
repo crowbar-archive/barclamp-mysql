@@ -9,9 +9,12 @@
   "deployment": {
     "mysql": {
       "crowbar-revision": 0,
-      "elements": { "mysql-server": [] },
+      "elements": { 
+        "mysql-server": [],
+        "mysql-client": []
+      },
       "element_order": [
-        [ "mysql-server" ]
+        [ "mysql-server", "mysql-client" ]
       ],
       "config": {
         "environment": "mysql-base-config",
