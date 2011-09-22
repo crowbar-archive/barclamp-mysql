@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: mysql
-# Recipe:: default
+# Recipe:: test
 #
 # Copyright 2008-2011, Keith Hudgins.
 #
@@ -20,3 +20,24 @@
 
 include_recipe "mysql::client"
 
+
+db_server = search(:node, "run_list:recipe[mysql::server]")
+
+mysql_database "create test database" do
+  host "#{db_server[0][:rackspace][:private_ip]}"
+  action :query
+  
+end
+
+mysql_database "create test database user" do
+  
+end
+
+
+mysql_database "create application_production database" do
+  host "localhost"
+  username "root"
+  password node[:mysql][:server_root_password]
+  database "application_production"
+  action :create_db
+end
