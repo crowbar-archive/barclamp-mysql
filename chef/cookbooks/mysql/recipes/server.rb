@@ -36,10 +36,10 @@ if platform?(%w{debian ubuntu})
     recursive true
   end
 
-#  execute "preseed mysql-server" do
-#    command "debconf-set-selections /var/cache/local/preseeding/mysql-server.seed"
-#    action :nothing
-#  end
+  execute "preseed mysql-server" do
+    command "debconf-set-selections /var/cache/local/preseeding/mysql-server.seed"
+    action :nothing
+  end
 
   template "/var/cache/local/preseeding/mysql-server.seed" do
     source "mysql-server.seed.erb"
@@ -94,29 +94,12 @@ unless Chef::Config[:solo]
   end
 end
 
-# set the root password on platforms 
-# that don't support pre-seeding
-unless platform?(%w{debian ubuntu})
-
-  execute "assign-root-password" do
-    command "/usr/bin/mysqladmin -u root password #{node['mysql']['server_root_password']}"
-    action :run
-    only_if "/usr/bin/mysql -u root -e 'show databases;'"
-  end
-
-end
-
 grants_path = value_for_platform(
   ["centos", "redhat", "suse", "fedora" ] => {
     "default" => "/etc/mysql_grants.sql"
   },
   "default" => "/etc/mysql/grants.sql"
 )
-
-execute "mysql-install-privileges" do  
-  command "/usr/bin/mysql -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }#{node['mysql']['server_root_password']} < #{grants_path}"
-  action :nothing
-end
 
 template "/etc/mysql/grants.sql" do
   path grants_path
@@ -125,7 +108,14 @@ template "/etc/mysql/grants.sql" do
   group "root"
   mode "0600"
   action :create
-  notifies :run, "execute[mysql-install-privileges]"
 end
 
-
+if system('mysql -u root "show databases;"') do
+  execute "mysql-install-privileges" do  
+    command "/usr/bin/mysql -u root < #{grants_path}"
+  end
+else
+  execute "mysql-install-privileges" do  
+    command "/usr/bin/mysql -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }#{node['mysql']['server_root_password']} < #{grants_path}"
+  end
+end
