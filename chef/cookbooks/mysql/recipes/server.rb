@@ -36,17 +36,17 @@ if platform?(%w{debian ubuntu})
     recursive true
   end
 
-  execute "preseed mysql-server" do
-    command "debconf-set-selections /var/cache/local/preseeding/mysql-server.seed"
-    action :nothing
-  end
+#  execute "preseed mysql-server" do
+#    command "debconf-set-selections /var/cache/local/preseeding/mysql-server.seed"
+#    action :nothing
+#  end
 
   template "/var/cache/local/preseeding/mysql-server.seed" do
     source "mysql-server.seed.erb"
     owner "root"
     group "root"
     mode "0600"
-    notifies :run, resources(:execute => "preseed mysql-server"), :immediately
+#    notifies :run, resources(:execute => "preseed mysql-server"), :immediately
   end
 
   template "/etc/mysql/debian.cnf" do
