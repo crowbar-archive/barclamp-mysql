@@ -25,6 +25,7 @@ include_recipe "mysql::client"
 node.set_unless['mysql']['server_debian_password'] = secure_password
 node.set_unless['mysql']['server_root_password']   = secure_password
 node.set_unless['mysql']['server_repl_password']   = secure_password
+node.set_unless['mysql']['db_maker_password']      = secure_password
 
 if platform?(%w{debian ubuntu})
 
@@ -112,23 +113,19 @@ grants_path = value_for_platform(
   "default" => "/etc/mysql/grants.sql"
 )
 
-begin
-  t = resources("template[/etc/mysql/grants.sql]")
-rescue
-  Chef::Log.info("Could not find previously defined grants.sql resource")
-  t = template "/etc/mysql/grants.sql" do
-    path grants_path
-    source "grants.sql.erb"
-    owner "root"
-    group "root"
-    mode "0600"
-    action :create
-  end
-end
-
-execute "mysql-install-privileges" do
-  
+execute "mysql-install-privileges" do  
   command "/usr/bin/mysql -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }#{node['mysql']['server_root_password']} < #{grants_path}"
   action :nothing
-  subscribes :run, resources("template[/etc/mysql/grants.sql]"), :delayed
 end
+
+template "/etc/mysql/grants.sql" do
+  path grants_path
+  source "grants.sql.erb"
+  owner "root"
+  group "root"
+  mode "0600"
+  action :create
+  notifies :run, "execute[mysql-install-privileges]"
+end
+
+
