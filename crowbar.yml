@@ -25,9 +25,6 @@ crowbar:
   layout: 1
   order: 1000
 
-nav:
-  add:
-    mysql: barclamp_index_barclamp_path
 
 locale_additions:
   en:

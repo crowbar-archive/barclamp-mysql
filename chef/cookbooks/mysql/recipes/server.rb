@@ -110,7 +110,7 @@ template "/etc/mysql/grants.sql" do
   action :create
 end
 
-if system('mysql -u root -e "show databases;"') do
+if system('mysql -u root -e "show databases;"')
   execute "mysql-install-privileges" do  
     command "/usr/bin/mysql -u root < #{grants_path}"
   end
