@@ -16,12 +16,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This is a proof of concept/example for how to create a remote database
+# Basically, you can use the snippets below
+
+# Include OpenSSL Password so we can make a new password for our dbuser
+# (This example re-uses)
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
+
+node.set_unless['testnamespace']['db_test_user_password']
 
 include_recipe "mysql::client"
 
-
+# Chef search query to pull your server. This returns an array
+# of nodes. In our example here, there's only ONE mysql-server node.
+# Because of this, we know it's the first one
+# Thus, the db_server[0] bit.
 db_server = search(:node, "role:mysql-server")
+
+# This saves the password so that we're idempotent.
+# Doesn't work on chef solo since there's no place to 
+# save node data there.
+unless Chef::Config[:solo]
+  ruby_block "save node data" do
+    block do
+      node.save
+    end
+    action :create
+  end
+end
 
 mysql_database "create test database" do
   host "#{db_server[0].ipaddress}"
@@ -30,25 +52,15 @@ mysql_database "create test database" do
   database "test_db"
   action :create_db
 end
-Chef::Log.info "pwgimme:  #{node[:mysql][:db_maker_password]}"
+
+# This is a logging example of how to pull a password from the node's data space.
 Chef::Log.info "pwgimme:  #{db_server[0].mysql.db_maker_password}"
 
-# The stanza below does not work. Yet.
-
-#mysql_database "create test database user" do
-#  host "#{db_server[0].ipaddress}"
-#  username "db_maker"
-#  password "#{db_server[0].mysql.db_maker_password}"
-#  database "test_db"
-#  action :query
-#  query "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON *.* TO 'test_user'@'%' IDENTIFIED BY '#{db_server[0].mysql.db_maker_password}' WITH GRANT OPTION;"
-#end
-
-
-#mysql_database "create application_production database" do
-#  host "localhost"
-#  username "root"
-#  password node[:mysql][:server_root_password]
-#  database "application_production"
-#  action :create_db
-#end
+mysql_database "create test database user" do
+  host "#{db_server[0].ipaddress}"
+  username "db_maker"
+  password "#{db_server[0].mysql.db_maker_password}"
+  database "test_db"
+  action :query
+  sql "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON *.* TO 'test_user'@'%' IDENTIFIED BY '#{node[:testnamespace][:db_test_user_password]}' WITH GRANT OPTION;"
+end
