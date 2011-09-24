@@ -46,7 +46,7 @@ if platform?(%w{debian ubuntu})
     owner "root"
     group "root"
     mode "0600"
-#    notifies :run, resources(:execute => "preseed mysql-server"), :immediately
+    notifies :run, resources(:execute => "preseed mysql-server"), :immediately
   end
 
   template "/etc/mysql/debian.cnf" do
@@ -110,7 +110,10 @@ template "/etc/mysql/grants.sql" do
   action :create
 end
 
-status = system('mysql -u root -e "show databases;"')
+begin
+  status = system('mysql -u root -e "show databases;"')
+rescue
+end
 
 if status
   execute "mysql-install-privileges" do
