@@ -46,7 +46,7 @@ if platform?(%w{debian ubuntu})
     owner "root"
     group "root"
     mode "0600"
-#    notifies :run, resources(:execute => "preseed mysql-server"), :immediately
+    notifies :run, resources(:execute => "preseed mysql-server"), :immediately
   end
 
   template "/etc/mysql/debian.cnf" do
@@ -110,18 +110,25 @@ template "/etc/mysql/grants.sql" do
   action :create
 end
 
-begin
-  status = system('mysql -u root -e "show databases;"')
-rescue
-  # Do nothing if this errors
+# Wait a minute or two, just in case
+# This is debug, we can probably remove
+ruby_block "Wait" do
+  block do
+    sleep(120)
+  end
 end
 
-if status
-  execute "mysql-install-privileges" do
-    command "/usr/bin/mysql -u root < #{grants_path}"
-  end
-else
-  execute "mysql-install-privileges" do
-    command "/usr/bin/mysql -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }#{node['mysql']['server_root_password']} < #{grants_path}"
-  end
+# Hacky conditional execution.
+# We want to set the passwords if it's empty, so the 
+# conditional just runs a simple check with no password
+# to see if you can get into mysql without it.
+
+execute "mysql-install-privileges" do
+  command "/usr/bin/mysql -u root < #{grants_path}"
+  only_if 'mysql -u root -e "show databases;"'
+end
+
+execute "mysql-install-privileges" do
+  command "/usr/bin/mysql -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }#{node['mysql']['server_root_password']} < #{grants_path}"
+  not_if 'mysql -u root -e "show databases;"'
 end
