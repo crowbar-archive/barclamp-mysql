@@ -36,17 +36,11 @@ if platform?(%w{debian ubuntu})
     recursive true
   end
 
-  execute "preseed mysql-server" do
-    command "debconf-set-selections /var/cache/local/preseeding/mysql-server.seed"
-    action :nothing
-  end
-
   template "/var/cache/local/preseeding/mysql-server.seed" do
     source "mysql-server.seed.erb"
     owner "root"
     group "root"
     mode "0600"
-    notifies :run, resources(:execute => "preseed mysql-server"), :immediately
   end
 
   template "/etc/mysql/debian.cnf" do
@@ -55,6 +49,13 @@ if platform?(%w{debian ubuntu})
     group "root"
     mode "0600"
   end
+
+  execute "preseed mysql-server" do
+    command "debconf-set-selections /var/cache/local/preseeding/mysql-server.seed"
+    only_if "test -f /var/cache/local/preseeding/mysql-server.seed" 
+  end
+
+  
 
 end
 
@@ -94,6 +95,18 @@ unless Chef::Config[:solo]
   end
 end
 
+# set the root password on platforms 
+# that don't support pre-seeding
+unless platform?(%w{debian ubuntu})
+
+  execute "assign-root-password" do
+    command "/usr/bin/mysqladmin -u root password \"#{node['mysql']['server_root_password']}\""
+    action :run
+    only_if "/usr/bin/mysql -u root -e 'show databases;'"
+  end
+
+end
+
 grants_path = value_for_platform(
   ["centos", "redhat", "suse", "fedora" ] => {
     "default" => "/etc/mysql_grants.sql"
@@ -101,34 +114,21 @@ grants_path = value_for_platform(
   "default" => "/etc/mysql/grants.sql"
 )
 
-template "/etc/mysql/grants.sql" do
-  path grants_path
-  source "grants.sql.erb"
-  owner "root"
-  group "root"
-  mode "0600"
-  action :create
-end
-
-# Wait a minute or two, just in case
-# This is debug, we can probably remove
-ruby_block "Wait" do
-  block do
-    sleep(120)
+begin
+  t = resources("template[#{grants_path}]")
+rescue
+  Chef::Log.info("Could not find previously defined grants.sql resource")
+  t = template grants_path do
+    source "grants.sql.erb"
+    owner "root"
+    group "root"
+    mode "0600"
+    action :create
   end
-end
-
-# Hacky conditional execution.
-# We want to set the passwords if it's empty, so the 
-# conditional just runs a simple check with no password
-# to see if you can get into mysql without it.
-
-execute "mysql-install-privileges" do
-  command "/usr/bin/mysql -u root < #{grants_path}"
-  only_if 'mysql -u root -e "show databases;"'
 end
 
 execute "mysql-install-privileges" do
   command "/usr/bin/mysql -u root #{node['mysql']['server_root_password'].empty? ? '' : '-p' }#{node['mysql']['server_root_password']} < #{grants_path}"
-  not_if 'mysql -u root -e "show databases;"'
+  action :nothing
+  subscribes :run, resources("template[#{grants_path}]"), :immediately
 end
