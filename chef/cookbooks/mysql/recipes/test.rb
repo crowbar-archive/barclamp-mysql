@@ -31,7 +31,7 @@ include_recipe "mysql::client"
 # of nodes. In our example here, there's only ONE mysql-server node.
 # Because of this, we know it's the first one
 # Thus, the db_server[0] bit.
-db_server = search(:node, "role:mysql-server")
+db_server = search(:node, "name:#{node[:mysql-server]}")
 
 # This saves the password so that we're idempotent.
 # Doesn't work on chef solo since there's no place to 

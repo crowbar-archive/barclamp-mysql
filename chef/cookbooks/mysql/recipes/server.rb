@@ -46,7 +46,7 @@ if platform?(%w{debian ubuntu})
     owner "root"
     group "root"
     mode "0600"
-    notifies :run, resources(:execute => "preseed mysql-server"), :immediately
+#    notifies :run, resources(:execute => "preseed mysql-server"), :immediately
   end
 
   template "/etc/mysql/debian.cnf" do
@@ -113,6 +113,7 @@ end
 begin
   status = system('mysql -u root -e "show databases;"')
 rescue
+  # Do nothing if this errors
 end
 
 if status
