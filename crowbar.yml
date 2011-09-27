@@ -20,6 +20,8 @@ barclamp:
   display: Mysql
   description: Configures a MySQL Server
   version: 0
+  member:
+    - openstack
 
 crowbar:
   layout: 1
