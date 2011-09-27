@@ -73,8 +73,8 @@ service "mysql" do
   action :nothing
 end
 
-link "#{node[:mysql][:datadir]}/my.cnf" do
-  to value_for_platform([ "centos", "redhat", "suse" , "fedora" ] => {"default" => "/etc/my.cnf"}, "default" => "/etc/mysql/my.cnf")
+link value_for_platform([ "centos", "redhat", "suse" , "fedora" ] => {"default" => "/etc/my.cnf"}, "default" => "/etc/mysql/my.cnf") do
+  to "#{node[:mysql][:datadir]}/my.cnf"
 end
 
 template "#{node[:mysql][:datadir]}/my.cnf" do
