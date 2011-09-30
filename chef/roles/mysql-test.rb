@@ -1,8 +1,8 @@
-name "mysql-client"
+name "mysql-test"
 description "Mysql Client Role"
 run_list(
          "recipe[mysql::client]",
-         "recope[mysql::test]"
+         "recipe[mysql::test]"
 )
 default_attributes()
 override_attributes()
