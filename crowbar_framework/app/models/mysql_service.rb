@@ -50,6 +50,26 @@ class MysqlService < ServiceObject
 
       node.save
     end
+
+    #identify server node
+    server_nodes = role.override_attributes["mysql"]["elements"]["mysql-server"]
+    @logger.debug("Mysql mysql-server elements: #{server_nodes.inspect}")
+    if server_nodes.size == 1
+      server_name = server_nodes.first
+      @logger.debug("Mysql found single server node: #{server_name}")
+      # set mysql-server attribute for any mysql-client role nodes
+      cnodes = role.override_attributes["mysql"]["elements"]["mysql-client"]
+      @logger.debug("Mysql mysql-client elements: #{cnodes.inspect}")
+      unless cnodes.nil? or cnodes.empty?
+        cnodes.each do |n|
+          node = NodeObject.find_node_by_name n
+          node.crowbar["mysql-server"] = server_name
+          @logger.debug("Mysql assign node[:mysql-server] for #{n}")
+          node.save
+        end
+      end
+    end
+
     @logger.debug("Mysql apply_role_pre_chef_call: leaving")
   end
 
