@@ -4,7 +4,10 @@
 
 :javascript
   $(document).ready(function(){
-    var constraints = { "mysql-server": { "unique": false, "count": 1 } };
+    var constraints = {
+      "mysql-server": { "unique": false, "count": 1 },
+      "mysql-client": { "unique": false, "count": -1 }
+     };
     node_selector($('#drag_drop'), constraints);
   });
 
