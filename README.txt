@@ -1,4 +1,4 @@
-Welcome to the MySQL for the Crowbar Framework project
+Welcome to the MySQL Barclamp for the Crowbar Framework project
 =======================================================
 _Copyright 2011, Dell_
 
@@ -12,9 +12,31 @@ A Barclamp is a module component that implements functionality for Crowbar.  Cor
 About this Barclamp: Mysql
 -------------------------------------
 
-This Barclamp creates a MySQL server
+This Barclamp creates a MySQL server and configures clients so that they are easily integrated with the server via Chef attributes.
+
+To build a mysql server, simply apply a proposal with your chosen node as the mysql-server.
+There's no configuration required.
+
+The Nova barclamp has a working build that integrates with this barclamp
+(Currently hosted at github.com/khudgins/barclamp-nova - use the feature-mysql-barclamp branch).
+
+To integrate your own barclamp, see the test.rb recipe. This is NOT used in any available roles through Crowbar, but is an example for how you can use it.
+
+The Chef recipe for the server role creates a few resources for you to use. Primarily, it creates several MySQL database users, and generates secure, random passwords for each one. These users' passwords are stored as node attributes on the mysql-server node for you to use later.
+
+The users are:
+
+* root: Standard mysql root account. Remote access for this user is disabled.
+* debian-sys-maint: used by Ubuntu for table scrubbing and maintenance.
+* db-maker: an administrative user with database and table creation rights. Use this account to create your application-specific databases and user accounts. See the test recipe for an example of use. You can access MySQL from other nodes with this account.
+* repl: user with replication slave rights, for future use in master/slave HA scenarios.
 
 
+Known Bugs & Issues
+-------------------------------------
+Due to a chef-client race condition upon provisioning nodes, there's a nasty hack in the mysql-server recipe to enforce controllable passwords and permissions for MySQL. This will be removed when the race condition in core crowbar is solved. This bug will only manifest on debconf-based Linux distributions.
+
+HA capability is planned for both DRBD-backed Active/Passive clusters and MySQL Master-Slave replication. This has not yet been implemented.
 
 
 Legals
