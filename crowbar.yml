@@ -33,8 +33,11 @@ locale_additions:
     nav:
       mysql: Mysql
     barclamp:
-      mysql_edit_attributes: 
-        attributes: Attributes
-        datadir: /var/lib/mysql
-      mysql_edit_deployment: 
-        deployment: Deployment
+      show_deployment_raw:
+        role: Role
+      mysql:
+        edit_attributes:
+          attributes: Attributes
+          datadir: Datadir
+        edit_deployment:
+          deployment: Deployment
