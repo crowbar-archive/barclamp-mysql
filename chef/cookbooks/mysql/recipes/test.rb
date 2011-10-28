@@ -28,10 +28,12 @@ node.set_unless['testnamespace']['db_test_user_password']
 include_recipe "mysql::client"
 
 # Chef search query to pull your server. This returns an array
-# of nodes. In our example here, there's only ONE mysql-server node.
+# of nodes. In our example here, there's only ONE mysql-server node. If,
+# for some reason you have multiple notes with mysql-server role assigned
+# via your barclamp, you'll need to adjust this.
 # Because of this, we know it's the first one
 # Thus, the db_server[0] bit.
-db_server = search(:node, "name:#{node[:mysql-server]}")
+db_server = search(:node, "fqdn:#{node['mysql-server']}")
 
 # This saves the password so that we're idempotent.
 # Doesn't work on chef solo since there's no place to 

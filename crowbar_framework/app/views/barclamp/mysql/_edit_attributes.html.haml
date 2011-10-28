@@ -6,4 +6,4 @@
   %div.container
     %p
       %label{ :for => :datadir }= t('.datadir')
-      = input#datadir{:type => "text", :name => "datadir", :'data-default' => @proposal.raw_data['attributes'][@proposal.barclamp]["datadir"], :onchange => "update_value('datadir', 'datadir', 'string')"}
+      %input#datadir{:type => "text", :name => "datadir", :'data-default' => @proposal.raw_data['attributes'][@proposal.barclamp]["datadir"], :onchange => "update_value('datadir', 'datadir', 'string')"}
