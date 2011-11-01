@@ -55,8 +55,14 @@ if platform?(%w{debian ubuntu})
     only_if "test -f /var/cache/local/preseeding/mysql-server.seed" 
   end
 
-  
+end
 
+# For Crowbar, we need to set the address to bind - default to admin node.
+addr = node['mysql']['bind_address'] || ""
+newaddr = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
+if addr != newaddr
+  node['mysql']['bind_address'] = newaddr
+  node.save
 end
 
 package "mysql-server" do
