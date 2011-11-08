@@ -25,7 +25,7 @@ barclamp:
 
 crowbar:
   layout: 1
-  order: 1000
+  order: 74
 
 
 locale_additions:
