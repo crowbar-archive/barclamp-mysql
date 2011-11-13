@@ -20,6 +20,10 @@ class MysqlService < ServiceObject
     @logger = thelogger
   end
 
+  def self.allow_multiple_proposals?
+    true
+  end
+
   def create_proposal
     @logger.debug("Mysql create_proposal: entering")
     base = super
