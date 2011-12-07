@@ -71,7 +71,7 @@ default['mysql']['tunable']['innodb_open_files']        = 300
 
 # Replication Settings
 default['mysql']['tunable']['server_id']                = "1"
-default['mysql']['tunable']['expire_logs_days']         = 7
-default['mysql']['tunable']['max_binlog_size']          = "1G"
+default['mysql']['tunable']['expire_logs_days']         = 10
+default['mysql']['tunable']['max_binlog_size']          = "100M"
 default['mysql']['tunable']['auto_increment_increment'] = 10
 default['mysql']['tunable']['auto_increment_offset']    = 1
