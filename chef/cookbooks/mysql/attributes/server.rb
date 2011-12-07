@@ -57,7 +57,7 @@ default['mysql']['tunable']['thread_stack']             = "256K"
 default['mysql']['tunable']['wait_timeout']             = "180"
 
 default['mysql']['tunable']['query_cache_limit']        = "1M"
-default['mysql']['tunable']['query_cache_size']         = "16M"
+default['mysql']['tunable']['query_cache_size']         = "32M"
 
 default['mysql']['tunable']['log_slow_queries']         = "/var/log/mysql/slow.log"
 default['mysql']['tunable']['long_query_time']          = 2
