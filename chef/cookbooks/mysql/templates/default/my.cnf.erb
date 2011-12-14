@@ -43,14 +43,23 @@ nice            = 0
 #   also need to also adjust /etc/apparmor.d/usr.sbin.mysqld.
 #
 
-user            = mysql
-pid-file        = <%= node['mysql']['pid_file'] %>
-socket          = <%= node['mysql']['socket'] %>
-port            = 3306
-basedir         = /usr
-datadir         = <%= node['mysql']['datadir'] %>
-tmpdir          = /tmp
+user                   = mysql
+pid-file               = <%= node['mysql']['pid_file'] %>
+socket                 = <%= node['mysql']['socket'] %>
+port                   = 3306
+basedir                = /usr
+datadir                = <%= node['mysql']['datadir'] %>
+tmpdir                 = <%= node['mysql']['tmpdir'] %>
 skip-external-locking
+
+#
+# * Storage Engines
+#
+# Set this to force MySQL to use a particular engine / table-type
+# for new tables. This setting can still be overridden by specifying
+# the engine explicitly in the CREATE TABLE statement.
+default-storage-engine = <%= node['mysql']['storage_engine'] %>
+
 #
 # Instead of skip-networking the default is now to listen only on
 # localhost which is more compatible and is not less secure.
@@ -59,15 +68,13 @@ bind-address            = <%= node['mysql']['bind_address'] %>
 # * Fine Tuning
 #
 key_buffer              = <%= node['mysql']['tunable']['key_buffer'] %>
-max_allowed_packet      = 16M
-thread_stack            = 128K
-thread_cache_size       = 8
+max_allowed_packet      = <%= node['mysql']['tunable']['max_allowed_packet'] %>
+thread_stack            = <%= node['mysql']['tunable']['thread_stack'] %>
+thread_cache_size       = <%= node['mysql']['tunable']['thread_cache_size'] %>
 # This replaces the startup script and checks MyISAM tables if needed
 # the first time they are touched
-myisam-recover          = BACKUP
-#max_connections        = 100
-#table_cache            = 64
-#thread_concurrency     = 10
+myisam-recover          = <%= node['mysql']['tunable']['myisam_recover'] %>
+#thread_concurrency     = <%= node['mysql']['tunable']['thread_concurrency'] %>
 max_connections         = <%= node['mysql']['tunable']['max_connections'] %>
 wait_timeout            = <%= node['mysql']['tunable']['wait_timeout'] %>
 net_read_timeout        = <%= node['mysql']['tunable']['net_read_timeout'] %>
@@ -79,8 +86,12 @@ max_heap_table_size     = <%= node['mysql']['tunable']['max_heap_table_size'] %>
 #
 # * Query Cache Configuration
 #
-query_cache_limit       = 1M
-query_cache_size        = 16M
+# Generally, it is unwise to set the query cache to be larger than 64-128M
+# as the costs associated with maintaining the cache outweigh the performance
+# gains.
+query_cache_limit       = <%= node['mysql']['tunable']['query_cache_limit'] %>
+query_cache_size        = <%= node['mysql']['tunable']['query_cache_size'] %>
+
 #
 # * Logging and Replication
 #
@@ -94,16 +105,23 @@ query_cache_size        = 16M
 log_slow_queries        = <%= node['mysql']['tunable']['log_slow_queries'] %>
 long_query_time         = <%= node['mysql']['tunable']['long_query_time'] %>
 log-queries-not-using-indexes
+
 #
 # The following can be used as easy to replay backup logs or for replication.
 # note: if you are setting up a replication slave, see README.Debian about
 #       other settings you may need to change.
-#server-id              = 1
-#log_bin                        = /var/log/mysql/mysql-bin.log
-expire_logs_days        = 10
-max_binlog_size         = 100M
+server-id              = <%= node['mysql']['server_id'] %>
+log_bin                = <%= node['mysql']['logdir'] %>/mysql-bin.log
+expire_logs_days       = <%= node['mysql']['tunable']['expire_log_days'] %>
+max_binlog_size        = <%= node['mysql']['tunable']['max_binlog_size'] %>
+#
+# Uncomment the auto_increment options for Multi-Master replication
+#
+#auto_increment_increment = <%= node['mysql']['tunable']['auto_increment_increment'] %>
+#auto_increment_offset = <%= node['mysql']['tunable']['auto_increment_offset'] %>
 #binlog_do_db           = include_database_name
 #binlog_ignore_db       = include_database_name
+
 #
 # * InnoDB
 #
@@ -112,6 +130,10 @@ max_binlog_size         = 100M
 # You might want to disable InnoDB to shrink the mysqld process by circa 100MB.
 #skip-innodb
 innodb_buffer_pool_size = <%= node['mysql']['tunable']['innodb_buffer_pool_size'] %>
+innodb_log_buffer_size  = <%= node['mysql']['tunable']['innodb_log_buffer_size'] %>
+innodb_log_file_size    = <%= node['mysql']['tunable']['innodb_log_file_size'] %>
+innodb_file_per_table   = <%= node['mysql']['tunable']['innodb_file_per_table'] %>
+innodb_open_files       = <%= node['mysql']['tunable']['innodb_open_files'] %>
 #
 # * Federated
 #
@@ -134,13 +156,13 @@ skip-federated
 [mysqldump]
 quick
 quote-names
-max_allowed_packet      = 16M
+max_allowed_packet      = <%= node['mysql']['tunable']['max_allowed_packet'] %>
 
 [mysql]
 #no-auto-rehash # faster start of mysql but no tab completition
 
 [isamchk]
-key_buffer              = 16M
+key_buffer              = <%= node['mysql']['tunable']['key_buffer'] %>
 
 #
 # * NDB Cluster
