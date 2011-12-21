@@ -76,6 +76,20 @@ link value_for_platform([ "centos", "redhat", "suse" , "fedora" ] => {"default" 
   to "#{node[:mysql][:datadir]}/my.cnf"
 end
 
+directory "#{node[:mysql][:tmpdir]" do
+  owner "mysql"
+  group "mysql"
+  mode "0700"
+  action :create
+end
+
+directory "#{node[:mysql][:logdir]" do
+  owner "mysql"
+  group "mysql"
+  mode "0700"
+  action :create
+end
+
 template "#{node[:mysql][:datadir]}/my.cnf" do
   source "my.cnf.erb"
   owner "root"
