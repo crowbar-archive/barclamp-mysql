@@ -76,14 +76,14 @@ link value_for_platform([ "centos", "redhat", "suse" , "fedora" ] => {"default" 
   to "#{node[:mysql][:datadir]}/my.cnf"
 end
 
-directory "#{node[:mysql][:tmpdir]" do
+directory node[:mysql][:tmpdir] do
   owner "mysql"
   group "mysql"
   mode "0700"
   action :create
 end
 
-directory "#{node[:mysql][:logdir]" do
+directory node[:mysql][:logdir] do
   owner "mysql"
   group "mysql"
   mode "0700"
