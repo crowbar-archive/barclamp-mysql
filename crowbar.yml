@@ -43,3 +43,25 @@ locale_additions:
           datadir: Datadir
         edit_deployment:
           deployment: Deployment
+
+debs:
+  build_pkgs:
+    - libmysqlclient-dev
+  pkgs:
+    # mysql stuff
+    - libmysqlclient-dev
+    - mysql-client
+    - libmysql-ruby
+    - mysql-server
+rpms:
+  build_pkgs:
+    - mysql-devel
+  pkgs:
+    # mysql stuff
+    - mysql-devel
+    - mysql
+    - ruby-mysql
+    - mysql-server
+gems:
+  pkgs:
+    - mysql   
