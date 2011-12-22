@@ -90,12 +90,22 @@ directory node[:mysql][:logdir] do
   action :create
 end
 
+script "handle mysql restart" do
+  interpreter "bash"
+  action :nothing
+  code <<EOC
+service mysql stop
+rm /var/lib/mysql/ib_logfile?
+service mysql start
+EOC
+end
+
 template "#{node[:mysql][:datadir]}/my.cnf" do
   source "my.cnf.erb"
   owner "root"
   group "root"
   mode "0644"
-  notifies :restart, resources(:service => "mysql"), :immediately
+  notifies :run, resources(:script => "handle mysql restart"), :immediately
 end
 
 unless Chef::Config[:solo]
