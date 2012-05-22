@@ -53,6 +53,8 @@ debs:
     - mysql-client
     - libmysql-ruby
     - mysql-server
+  src_pkgs:
+    - mysql-5.5
 rpms:
   build_pkgs:
     - mysql-devel
@@ -64,4 +66,4 @@ rpms:
     - mysql-server
 gems:
   pkgs:
-    - mysql   
+    - mysql
