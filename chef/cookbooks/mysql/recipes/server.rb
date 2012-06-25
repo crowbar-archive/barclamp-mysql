@@ -51,7 +51,7 @@ end
 
 # For Crowbar, we need to set the address to bind - default to admin node.
 addr = node['mysql']['bind_address'] || ""
-newaddr = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
+newaddr = node.address.addr
 if addr != newaddr
   node['mysql']['bind_address'] = newaddr
   node.save
