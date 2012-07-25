@@ -29,21 +29,6 @@ crowbar:
   run_order: 74
   chef_order: 74
 
-
-locale_additions:
-  en:
-    nav:
-      mysql: Mysql
-    barclamp:
-      show_deployment_raw:
-        role: Role
-      mysql:
-        edit_attributes:
-          attributes: Attributes
-          datadir: Datadir
-        edit_deployment:
-          deployment: Deployment
-
 debs:
   build_pkgs:
     - libmysqlclient-dev
