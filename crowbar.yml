@@ -20,6 +20,7 @@ barclamp:
   display: Mysql
   description: Configures a MySQL Server
   version: 0
+  allow_multiple_proposals: true
   member:
     - openstack
 
