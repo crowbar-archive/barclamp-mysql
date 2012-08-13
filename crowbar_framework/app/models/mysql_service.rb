@@ -44,10 +44,10 @@ class MysqlService < ServiceObject
     end
 
     hash = new_config.config_hash
-    hash["server_debian_password"] = random_password if hash["server_debian_password"].nil?
-    hash["server_root_password"] = random_password if hash["server_root_password"].nil?
-    hash["server_repl_password"] = random_password if hash["server_repl_password"].nil?
-    hash["db_maker_password"] = random_password if hash["db_maker_password"].nil?
+    hash["mysql"]["server_debian_password"] = random_password if hash["mysql"]["server_debian_password"].nil?
+    hash["mysql"]["server_root_password"] = random_password if hash["mysql"]["server_root_password"].nil?
+    hash["mysql"]["server_repl_password"] = random_password if hash["mysql"]["server_repl_password"].nil?
+    hash["mysql"]["db_maker_password"] = random_password if hash["mysql"]["db_maker_password"].nil?
     new_config.config_hash = hash
 
     #identify server node
