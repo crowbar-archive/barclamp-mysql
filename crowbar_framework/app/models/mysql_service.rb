@@ -1,4 +1,4 @@
-# Copyright 2011, Dell 
+# Copyright 2012, Dell 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
 # you may not use this file except in compliance with the License. 
@@ -15,63 +15,56 @@
 
 class MysqlService < ServiceObject
 
-  def initialize(thelogger)
-    @bc_name = "mysql"
-    @logger = thelogger
-  end
-
   def create_proposal
     @logger.debug("Mysql create_proposal: entering")
     base = super
 
-    nodes = NodeObject.all
-    nodes.delete_if { |n| n.nil? or n.admin? }
+    nodes = Node.all
+    nodes.delete_if { |n| n.nil? or n.is_admin? }
     if nodes.size >= 1
-      base["deployment"]["mysql"]["elements"] = {
-        "mysql-server" => [ nodes.first[:fqdn] ]
-      }
+      add_role_to_instance_and_node(nodes[0].name, inst, "mysql-server")
     end
 
     @logger.debug("Mysql create_proposal: exiting")
     base
   end
 
-  def apply_role_pre_chef_call(old_role, role, all_nodes)
+  def apply_role_pre_chef_call(old_config, new_config, all_nodes)
     @logger.debug("Mysql apply_role_pre_chef_call: entering #{all_nodes.inspect}")
     return if all_nodes.empty?
 
     # Make sure the bind hosts are in the admin network
-    all_nodes.each do |n|
-      node = NodeObject.find_node_by_name n
+    all_nodes.each do |node|
+      admin_address = node.address.addr
 
-      admin_address = node.get_network_by_type("admin")["address"]
-      node.crowbar[:mysql] = {} if node.crowbar[:mysql].nil?
-      node.crowbar[:mysql][:api_bind_host] = admin_address
-
-      node.save
+      chash = new_config.active_config.get_node_config_hash(node)
+      chash[:mysql] = {} if node.crowbar[:mysql].nil?
+      chash[:mysql][:api_bind_host] = admin_address
+      new_config.active_config.set_node_config_hash(node, chash)
     end
 
-    role.default_attributes["mysql"]["server_debian_password"] = random_password if role.default_attributes["mysql"]["server_debian_password"].nil?
-    role.default_attributes["mysql"]["server_root_password"] = random_password if role.default_attributes["mysql"]["server_root_password"].nil?
-    role.default_attributes["mysql"]["server_repl_password"] = random_password if role.default_attributes["mysql"]["server_repl_password"].nil?
-    role.default_attributes["mysql"]["db_maker_password"] = random_password if role.default_attributes["mysql"]["db_maker_password"].nil?
-    role.save
+    hash = new_config.config_hash
+    hash["mysql"]["server_debian_password"] = random_password if hash["mysql"]["server_debian_password"].nil?
+    hash["mysql"]["server_root_password"] = random_password if hash["mysql"]["server_root_password"].nil?
+    hash["mysql"]["server_repl_password"] = random_password if hash["mysql"]["server_repl_password"].nil?
+    hash["mysql"]["db_maker_password"] = random_password if hash["mysql"]["db_maker_password"].nil?
+    new_config.config_hash = hash
 
     #identify server node
-    server_nodes = role.override_attributes["mysql"]["elements"]["mysql-server"]
+    server_nodes = new_config.active_config.get_nodes_by_role("mysql-server")
     @logger.debug("Mysql mysql-server elements: #{server_nodes.inspect}")
     if server_nodes.size == 1
-      server_name = server_nodes.first
+      server_name = server_nodes.first.name
       @logger.debug("Mysql found single server node: #{server_name}")
       # set mysql-server attribute for any mysql-client role nodes
-      cnodes = role.override_attributes["mysql"]["elements"]["mysql-client"]
+      cnodes = new_config.active_config.get_nodes_by_role("mysql-client")
       @logger.debug("Mysql mysql-client elements: #{cnodes.inspect}")
       unless cnodes.nil? or cnodes.empty?
         cnodes.each do |n|
-          node = NodeObject.find_node_by_name n
-          node.crowbar["mysql-server"] = server_name
+          chash = new_config.active_config.get_node_config_hash(n)
+          chash["mysql-server"] = server_name
+          new_config.active_config.set_node_config_hash(n, chash)
           @logger.debug("Mysql assign node[:mysql-server] for #{n}")
-          node.save
         end
       end
     end
