@@ -20,29 +20,15 @@ barclamp:
   display: Mysql
   description: Configures a MySQL Server
   version: 0
+  allow_multiple_proposals: true
   member:
     - openstack
 
 crowbar:
-  layout: 1
+  layout: 2
   order: 74
   run_order: 74
   chef_order: 74
-
-
-locale_additions:
-  en:
-    nav:
-      mysql: Mysql
-    barclamp:
-      show_deployment_raw:
-        role: Role
-      mysql:
-        edit_attributes:
-          attributes: Attributes
-          datadir: Datadir
-        edit_deployment:
-          deployment: Deployment
 
 debs:
   build_pkgs:
