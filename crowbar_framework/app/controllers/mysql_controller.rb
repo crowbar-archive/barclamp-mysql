@@ -14,8 +14,5 @@
 # 
 
 class MysqlController < BarclampController
-  def initialize
-    @service_object = MysqlService.new logger
-  end
 end
 
