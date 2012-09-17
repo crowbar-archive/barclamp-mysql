@@ -38,7 +38,7 @@ class MysqlService < ServiceObject
       admin_address = node.address.addr
 
       chash = new_config.active_config.get_node_config_hash(node)
-      chash[:mysql] = {} if node.crowbar[:mysql].nil?
+      chash[:mysql] = {} unless chash[:mysql]
       chash[:mysql][:api_bind_host] = admin_address
       new_config.active_config.set_node_config_hash(node, chash)
     end
