@@ -1,11 +1,5 @@
 # theses are the default meta_data values
 license:    Apache 2
 copyright:  2012 by Dell, Inc
-date:       July 25, 2012
+date:       September 16, 2012
 
-crowbar+book-barclamps:
-  mysql+barclamp-info
-    
-crowbar+book-licenses:
-  openstack+licenses-openstack-meta:
-    mysql+licenses
