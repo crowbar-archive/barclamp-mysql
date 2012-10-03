@@ -55,10 +55,13 @@ class MysqlService < ServiceObject
       node.save
     end
 
-    role.default_attributes["mysql"]["server_debian_password"] = random_password if role.default_attributes["mysql"]["server_debian_password"].nil?
-    role.default_attributes["mysql"]["server_root_password"] = random_password if role.default_attributes["mysql"]["server_root_password"].nil?
-    role.default_attributes["mysql"]["server_repl_password"] = random_password if role.default_attributes["mysql"]["server_repl_password"].nil?
-    role.default_attributes["mysql"]["db_maker_password"] = random_password if role.default_attributes["mysql"]["db_maker_password"].nil?
+    om = old_role ? old_role.default_attributes["mysql"] : {}
+    nm = role.default_attributes["mysql"]
+
+    nm["server_debian_password"] = om["server_debian_password"] || random_password 
+    nm["server_root_password"] = om["server_root_password"] || random_password
+    nm["server_repl_password"] = om["server_repl_password"] || random_password
+    nm["db_maker_password"] = om["db_maker_password"] || random_password
     role.save
 
     #identify server node
