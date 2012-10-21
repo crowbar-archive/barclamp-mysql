@@ -19,11 +19,8 @@ class MysqlService < ServiceObject
     @logger.debug("Mysql create_proposal: entering")
     base = super(name)
 
-    nodes = Node.all
-    nodes.delete_if { |n| n.nil? or n.is_admin? }
-    if nodes.size >= 1
-      add_role_to_instance_and_node(nodes[0].name, inst, "mysql-server")
-    end
+    node = Node.first(:conditions => [ "admin = ?", false])
+    add_role_to_instance_and_node(node.name, base.name, "mysql-server") if node
 
     @logger.debug("Mysql create_proposal: exiting")
     base
