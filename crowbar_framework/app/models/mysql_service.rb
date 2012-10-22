@@ -34,33 +34,34 @@ class MysqlService < ServiceObject
     all_nodes.each do |node|
       admin_address = node.address.addr
 
-      chash = new_config.active_config.get_node_config_hash(node)
+      chash = new_config.get_node_config_hash(node)
       chash[:mysql] = {} unless chash[:mysql]
       chash[:mysql][:api_bind_host] = admin_address
-      new_config.active_config.set_node_config_hash(node, chash)
+      new_config.set_node_config_hash(node, chash)
     end
 
     hash = new_config.config_hash
+    hash["mysql"] = {} unless hash["mysql"]
     hash["mysql"]["server_debian_password"] = random_password if hash["mysql"]["server_debian_password"].nil?
     hash["mysql"]["server_root_password"] = random_password if hash["mysql"]["server_root_password"].nil?
     hash["mysql"]["server_repl_password"] = random_password if hash["mysql"]["server_repl_password"].nil?
     hash["mysql"]["db_maker_password"] = random_password if hash["mysql"]["db_maker_password"].nil?
     new_config.config_hash = hash
 
-    #identify server node
-    server_nodes = new_config.active_config.get_nodes_by_role("mysql-server")
-    @logger.debug("Mysql mysql-server elements: #{server_nodes.inspect}")
-    if server_nodes.size == 1
-      server_name = server_nodes.first.name
-      @logger.debug("Mysql found single server node: #{server_name}")
-      # set mysql-server attribute for any mysql-client role nodes
-      cnodes = new_config.active_config.get_nodes_by_role("mysql-client")
-      @logger.debug("Mysql mysql-client elements: #{cnodes.inspect}")
-      unless cnodes.nil? or cnodes.empty?
+    cnodes = new_config.get_nodes_by_role("mysql-client")
+    @logger.debug("Mysql mysql-client elements: #{cnodes.inspect}")
+    unless cnodes.nil? or cnodes.empty?
+      #identify server node
+      server_nodes = new_config.get_nodes_by_role("mysql-server")
+      @logger.debug("Mysql mysql-server elements: #{server_nodes.inspect}")
+      if server_nodes.size == 1
+        server_name = server_nodes.first.name
+        @logger.debug("Mysql found single server node: #{server_name}")
+        # set mysql-server attribute for any mysql-client role nodes
         cnodes.each do |n|
-          chash = new_config.active_config.get_node_config_hash(n)
+          chash = new_config.get_node_config_hash(n)
           chash["mysql-server"] = server_name
-          new_config.active_config.set_node_config_hash(n, chash)
+          new_config.set_node_config_hash(n, chash)
           @logger.debug("Mysql assign node[:mysql-server] for #{n}")
         end
       end
