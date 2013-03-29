@@ -1,0 +1,17 @@
+{
+    "type": "map",
+    "required": true,
+    "mapping": {
+        "mysql": {
+            "type": "map",
+            "required": true,
+            "mapping": {
+                "db_maker_password": { "type": "str" },
+                "server_debian_password": { "type": "str" },
+                "server_repl_password": { "type": "str" },
+                "server_root_password": { "type": "str" },
+                "datadir": { "type": "str", "required": true }
+            }
+        }
+    }
+}

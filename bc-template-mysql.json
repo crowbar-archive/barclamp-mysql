@@ -6,6 +6,10 @@
       "datadir": "/var/lib/mysql"
     }
   },
+    "roles": {
+        "mysql-client": { "jig": "chef" },
+        "mysql-server": { "jig": "chef" }
+    },
   "deployment": {
     "mysql": {
       "crowbar-revision": 0,
