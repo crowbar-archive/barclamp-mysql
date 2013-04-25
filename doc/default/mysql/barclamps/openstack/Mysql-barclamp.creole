@@ -1,0 +1,50 @@
+> NOTE: move this to the mysql Barclamp directory
+
+See all, [[Barclamp List]]
+
+//This is a Creole document//
+
+== Overview
+
+The MySQL barclamp provides a method to instantiate MySQL database servers by placing a node in the **mysql-server** role.  The barclamp also provides a **mysql-client** that allows the node in that role to access the database server in the paired **mysql-server** role.  The mysql cookbooks provide resource providers to access and control create databases and running sql against them as LWRPs.
+
+== Roles
+
+| **Role** | **Description** |
+| mysql-server | Create a single mysql server instance. |
+| mysql-client | Give the node access to the mysql-server.  This can also be done with search currently. |
+
+== Scripts
+
+The barclamp provides a single mysql cookbook. The cookbook is used for building mysql servers and allowing clients to manipulate databases in the server.
+
+The standard CLI script has been provided.
+
+== Parameters
+
+The barclamp has the following parameters:
+
+| **Name** | **Default** | **Description** |
+| datadir | /var/lib/mysql | The default working directory for mysql. |
+| db_maker_password | Random String | A String value for the password to make databases.  This password is used to only create new databases by clients. |
+| server_debian_password | Random String | Dynamically created password for debian install |
+| server_repl_password | Random String | Dynamically created password for replication servers. **Not Used Currently** |
+| server_root_password | Random String | Dynamically created password for root access. |
+
+
+== Operations
+
+Upon application of the proposal, the passwords are dynamically created for the accounts if they do not exist.  The system will make sure that the server is created first.
+
+
+== Useful Commands and Information
+
+
+
+== Limitations and/or Futures
+
+A pending commit allows for backed up databases and storing it. 
+
+Another change is for a DRBD-based datadir.
+
+Another change is to allow for replication slaves.
