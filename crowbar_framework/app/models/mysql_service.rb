@@ -30,43 +30,31 @@ class MysqlService < ServiceObject
     @logger.debug("Mysql apply_role_pre_chef_call: entering #{all_nodes.inspect}")
     return if all_nodes.empty?
 
-    # Make sure the bind hosts are in the admin network
+    # Find the nodes we want to be clients and servers
+    server_nodes = new_config.get_nodes_by_role("mysql-server")
+    @logger.debug("Mysql mysql-server elements: #{server_nodes.inspect}")
+    client_nodes = new_config.get_nodes_by_role("mysql-client")
+    @logger.debug("Mysql mysql-client elements: #{client_nodes.inspect}")
+
+    # Whack a config on to them.
     all_nodes.each do |node|
       admin_address = node.address.addr
-
-      chash = new_config.get_node_config_hash(node)
-      chash[:mysql] = {} unless chash[:mysql]
-      chash[:mysql][:api_bind_host] = admin_address
-      new_config.set_node_config_hash(node, chash)
-    end
-
-    hash = new_config.config_hash
-    hash["mysql"] = {} unless hash["mysql"]
-    hash["mysql"]["server_debian_password"] = random_password if hash["mysql"]["server_debian_password"].nil?
-    hash["mysql"]["server_root_password"] = random_password if hash["mysql"]["server_root_password"].nil?
-    hash["mysql"]["server_repl_password"] = random_password if hash["mysql"]["server_repl_password"].nil?
-    hash["mysql"]["db_maker_password"] = random_password if hash["mysql"]["db_maker_password"].nil?
-    new_config.config_hash = hash
-
-    cnodes = new_config.get_nodes_by_role("mysql-client")
-    @logger.debug("Mysql mysql-client elements: #{cnodes.inspect}")
-    unless cnodes.nil? or cnodes.empty?
-      #identify server node
-      server_nodes = new_config.get_nodes_by_role("mysql-server")
-      @logger.debug("Mysql mysql-server elements: #{server_nodes.inspect}")
-      if server_nodes.size == 1
-        server_name = server_nodes.first.name
-        @logger.debug("Mysql found single server node: #{server_name}")
-        # set mysql-server attribute for any mysql-client role nodes
-        cnodes.each do |n|
-          chash = new_config.get_node_config_hash(n)
-          chash["mysql-server"] = server_name
-          new_config.set_node_config_hash(n, chash)
-          @logger.debug("Mysql assign node[:mysql-server] for #{n}")
+      node_hash = new_config.get_node_config_hash(node)
+      node_hash[:mysql] ||= {}
+      if server_nodes.member?(node)
+        ["server_debian_password","server_root_password",
+         "server_repl_password","db_maker_password"].each do |p|
+          node_hash[:mysql][p] ||= random_password
         end
       end
+      if client_nodes.member?(node) && !server_nodes.empty? &&
+          !node_hash["mysql_server"]
+        @logger.debug("Mysql assign node[:mysql-server] for #{node.name}")
+        node_hash["mysql-server"] ||= server_nodes[0].name
+      end
+      node_hash[:mysql][:api_bind_host] = admin_address
+      new_config.set_node_config_hash(node, node_hash)
     end
-
     @logger.debug("Mysql apply_role_pre_chef_call: leaving")
   end
 
